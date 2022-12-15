@@ -20,7 +20,6 @@ use Yii;
  * @property int $status
  * @property int $category_id
  * @property string|null $short_description
- * @property string|null $dscription
  *
  * @property GameCategory $category
  * @property PromoGames[] $promoGames
@@ -42,7 +41,7 @@ class Game extends \yii\db\ActiveRecord
     {
         return [
             [['title', 'description', 'big_icon_link', 'small_icon_link', 'video', 'developer', 'publisher', 'release_date', 'platform', 'category_id'], 'required'],
-            [['title', 'description', 'big_icon_link', 'small_icon_link', 'video', 'developer', 'publisher', 'release_date', 'platform', 'short_description', 'dscription'], 'string'],
+            [['title', 'description', 'big_icon_link', 'small_icon_link', 'video', 'developer', 'publisher', 'release_date', 'platform', 'short_description'], 'string'],
             [['status', 'category_id'], 'integer'],
             [['category_id'], 'exist', 'skipOnError' => true, 'targetClass' => GameCategory::className(), 'targetAttribute' => ['category_id' => 'id']],
         ];
@@ -67,7 +66,6 @@ class Game extends \yii\db\ActiveRecord
             'status' => 'Status',
             'category_id' => 'Category ID',
             'short_description' => 'Short Description',
-            'dscription' => 'Dscription',
         ];
     }
 

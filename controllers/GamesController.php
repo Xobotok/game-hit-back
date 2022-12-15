@@ -3,7 +3,7 @@
 namespace app\controllers;
 
 use app\models\Game;
-use app\search\Game as GameSearch;
+use app\search\GameSearch;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;

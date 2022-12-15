@@ -1,5 +1,6 @@
 <?php
 
+use app\models\Game;
 use yii\helpers\Html;
 use yii\helpers\Url;
 use yii\grid\ActionColumn;
@@ -41,7 +42,6 @@ $this->params['breadcrumbs'][] = $this->title;
             //'status',
             //'category_id',
             //'short_description:ntext',
-            //'dscription:ntext',
             [
                 'class' => ActionColumn::className(),
                 'urlCreator' => function ($action, Game $model, $key, $index, $column) {

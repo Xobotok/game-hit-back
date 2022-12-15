@@ -18,7 +18,7 @@ class GameSearch extends Game
     {
         return [
             [['id', 'status', 'category_id'], 'integer'],
-            [['title', 'description', 'big_icon_link', 'small_icon_link', 'video', 'developer', 'publisher', 'release_date', 'platform', 'short_description', 'dscription'], 'safe'],
+            [['title', 'description', 'big_icon_link', 'small_icon_link', 'video', 'developer', 'publisher', 'release_date', 'platform', 'short_description'], 'safe'],
         ];
     }
 
@@ -72,8 +72,7 @@ class GameSearch extends Game
             ->andFilterWhere(['like', 'publisher', $this->publisher])
             ->andFilterWhere(['like', 'release_date', $this->release_date])
             ->andFilterWhere(['like', 'platform', $this->platform])
-            ->andFilterWhere(['like', 'short_description', $this->short_description])
-            ->andFilterWhere(['like', 'dscription', $this->dscription]);
+            ->andFilterWhere(['like', 'short_description', $this->short_description]);
 
         return $dataProvider;
     }

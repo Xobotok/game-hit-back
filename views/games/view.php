@@ -42,7 +42,6 @@ $this->params['breadcrumbs'][] = $this->title;
             'status',
             'category_id',
             'short_description:ntext',
-            'dscription:ntext',
         ],
     ]) ?>
 

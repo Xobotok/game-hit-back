@@ -2,133 +2,56 @@
 
 namespace app\controllers;
 
+use app\models\Document;
 use app\models\Game;
+use app\models\GameCategory;
+use app\models\GameImage;
 use app\search\GameSearch;
-use yii\web\Controller;
+use yii\db\Query;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
 
 /**
  * GameController implements the CRUD actions for Game model.
  */
-class GameController extends Controller
+class GameController extends BaseController
 {
-    /**
-     * @inheritDoc
-     */
-    public function behaviors()
-    {
-        return array_merge(
-            parent::behaviors(),
-            [
-                'verbs' => [
-                    'class' => VerbFilter::className(),
-                    'actions' => [
-                        'delete' => ['POST'],
-                    ],
-                ],
-            ]
-        );
+    public function actionGetGame() {
+        $game = (new \yii\db\Query());
+        $game
+            ->select(['*', Game::tableName() .'.id as id', GameCategory::tableName() . '.title as category_title',
+                Game::tableName() . '.title as title',
+                Game::tableName() . '.description as description',
+                GameCategory::tableName() . '.description as category_description',
+                Document::tableName().'.link as image',
+                ])
+            ->from(Game::tableName())
+            ->leftJoin(GameCategory::tableName(),Game::tableName(). '.category_id=' . GameCategory::tableName() .'.id')
+            ->leftJoin(GameImage::tableName(), Game::tableName() . '.id=' . GameImage::tableName() . '.game_id')
+            ->leftJoin(Document::tableName(), Document::tableName() . '.id=' . GameImage::tableName() . '.document_id')
+            ->where([Game::tableName().'.id' => $this->get()->id]);
+        return $this->createAnswer(1, $game->one(), 'Игра найдена');
     }
-
-    /**
-     * Lists all Game models.
-     *
-     * @return string
-     */
-    public function actionIndex()
-    {
-        $searchModel = new GameSearch();
-        $dataProvider = $searchModel->search($this->request->queryParams);
-
-        return $this->render('index', [
-            'searchModel' => $searchModel,
-            'dataProvider' => $dataProvider,
-        ]);
-    }
-
-    /**
-     * Displays a single Game model.
-     * @param int $id ID
-     * @return string
-     * @throws NotFoundHttpException if the model cannot be found
-     */
-    public function actionView($id)
-    {
-        return $this->render('view', [
-            'model' => $this->findModel($id),
-        ]);
-    }
-
-    /**
-     * Creates a new Game model.
-     * If creation is successful, the browser will be redirected to the 'view' page.
-     * @return string|\yii\web\Response
-     */
-    public function actionCreate()
-    {
-        $model = new Game();
-
-        if ($this->request->isPost) {
-            if ($model->load($this->request->post()) && $model->save()) {
-                return $this->redirect(['view', 'id' => $model->id]);
-            }
-        } else {
-            $model->loadDefaultValues();
+    public function actionGetGames() {
+        $games = (new \yii\db\Query());
+        $games
+            ->select(['*', GameCategory::tableName() . '.title as category_title',
+                Game::tableName() . '.title as title',
+                Game::tableName() . '.description as description',
+                GameCategory::tableName() . '.description as category_description'])
+            ->from(Game::tableName())
+            ->leftJoin(GameCategory::tableName(),Game::tableName(). '.category_id=' . GameCategory::tableName() .'.id');
+        $count = $games->count();
+        if($this->get()->limit) {
+            $games->limit = $this->get()->limit;
         }
-
-        return $this->render('create', [
-            'model' => $model,
-        ]);
-    }
-
-    /**
-     * Updates an existing Game model.
-     * If update is successful, the browser will be redirected to the 'view' page.
-     * @param int $id ID
-     * @return string|\yii\web\Response
-     * @throws NotFoundHttpException if the model cannot be found
-     */
-    public function actionUpdate($id)
-    {
-        $model = $this->findModel($id);
-
-        if ($this->request->isPost && $model->load($this->request->post()) && $model->save()) {
-            return $this->redirect(['view', 'id' => $model->id]);
+        if($this->get()->offset) {
+            $games->offset = $this->get()->offset;
         }
-
-        return $this->render('update', [
-            'model' => $model,
-        ]);
-    }
-
-    /**
-     * Deletes an existing Game model.
-     * If deletion is successful, the browser will be redirected to the 'index' page.
-     * @param int $id ID
-     * @return \yii\web\Response
-     * @throws NotFoundHttpException if the model cannot be found
-     */
-    public function actionDelete($id)
-    {
-        $this->findModel($id)->delete();
-
-        return $this->redirect(['index']);
-    }
-
-    /**
-     * Finds the Game model based on its primary key value.
-     * If the model is not found, a 404 HTTP exception will be thrown.
-     * @param int $id ID
-     * @return Game the loaded model
-     * @throws NotFoundHttpException if the model cannot be found
-     */
-    protected function findModel($id)
-    {
-        if (($model = Game::findOne(['id' => $id])) !== null) {
-            return $model;
-        }
-
-        throw new NotFoundHttpException('The requested page does not exist.');
+        $games = $games->all();
+        $data = (object)[];
+        $data->games = $games;
+        $data->total = $count;
+        return $this->createAnswer(1, $data);
     }
 }
