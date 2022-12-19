@@ -16,9 +16,20 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'description')->textarea(['rows' => 6]) ?>
 
-    <?= $form->field($model, 'big_icon_link')->textarea(['rows' => 6]) ?>
+    <?php if($model->poster_image) {
+        echo $model->poster_image;
+    } ?>
+    <?= $form->field($model, 'poster_image_file')->fileInput() ?>
+    <?php if($model->gameplay_image) {
+        echo $model->gameplay_image;
+    } ?>
+    <?= $form->field($model, 'gameplay_image_file')->fileInput() ?>
+    <?php if($model->small_icon_image) {
+        echo $model->small_icon_image;
+    } ?>
+    <?= $form->field($model, 'small_icon_file')->fileInput() ?>
 
-    <?= $form->field($model, 'small_icon_link')->textarea(['rows' => 6]) ?>
+    <?= $form->field($model, 'gameplay_image')->textarea(['rows' => 6]) ?>
 
     <?= $form->field($model, 'video')->textarea(['rows' => 6]) ?>
 
@@ -32,9 +43,9 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'status')->textInput() ?>
 
-    <?= $form->field($model, 'category_id')->textInput() ?>
-
     <?= $form->field($model, 'short_description')->textarea(['rows' => 6]) ?>
+
+    <?= $form->field($model, 'rating')->textInput(['maxlength' => true]) ?>
 
     <div class="form-group">
         <?= Html::submitButton('Save', ['class' => 'btn btn-success']) ?>

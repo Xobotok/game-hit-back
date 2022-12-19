@@ -3,6 +3,7 @@
 namespace app\models;
 
 use Yii;
+use yii\web\UploadedFile;
 
 /**
  * This is the model class for table "game".
@@ -10,22 +11,30 @@ use Yii;
  * @property int $id
  * @property string $title
  * @property string $description
- * @property string $big_icon_link
- * @property string $small_icon_link
- * @property string $video
+ * @property string|null $poster_image
+ * @property string|null $gameplay_image
+ * @property string|null $small_icon_image
+ * @property string|null $video
  * @property string $developer
  * @property string $publisher
  * @property string $release_date
  * @property string $platform
  * @property int $status
- * @property int $category_id
  * @property string|null $short_description
+ * @property string $rating
  *
- * @property GameCategory $category
+ * @property GameCategory[] $gameCategories
+ * @property GameImage[] $gameImages
  * @property PromoGames[] $promoGames
  */
 class Game extends \yii\db\ActiveRecord
 {
+    /**
+     * @var UploadedFile
+     */
+    public $poster_image_file;
+    public $small_icon_file;
+    public $gameplay_image_file;
     /**
      * {@inheritdoc}
      */
@@ -40,10 +49,28 @@ class Game extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['title', 'description', 'big_icon_link', 'small_icon_link', 'video', 'developer', 'publisher', 'release_date', 'platform', 'category_id'], 'required'],
-            [['title', 'description', 'big_icon_link', 'small_icon_link', 'video', 'developer', 'publisher', 'release_date', 'platform', 'short_description'], 'string'],
-            [['status', 'category_id'], 'integer'],
-            [['category_id'], 'exist', 'skipOnError' => true, 'targetClass' => GameCategory::className(), 'targetAttribute' => ['category_id' => 'id']],
+            [['title', 'description', 'developer', 'publisher', 'release_date', 'platform', 'rating'], 'required'],
+            ['poster_image_file', 'image',
+                'extensions' => ['jpg', 'jpeg', 'png', 'gif'],
+                'checkExtensionByMimeType' => true,
+                'maxSize' => 10512000,
+                'tooBig' => 'Limit is 500KB'
+            ],
+            ['small_icon_file', 'image',
+                'extensions' => ['jpg', 'jpeg', 'png', 'gif'],
+                'checkExtensionByMimeType' => true,
+                'maxSize' => 512000, // 500 килобайт = 500 * 1024 байта = 512 000 байт
+                'tooBig' => 'Limit is 500KB'
+            ],
+            ['gameplay_image_file', 'image',
+                'extensions' => ['jpg', 'jpeg', 'png', 'gif'],
+                'checkExtensionByMimeType' => true,
+                'maxSize' => 10512000, // 3500 килобайт = 500 * 1024 байта = 512 000 байт
+                'tooBig' => 'Limit is 500KB'
+            ],
+            [['title', 'poster_image', 'description', 'gameplay_image', 'small_icon_image', 'video', 'developer', 'publisher', 'release_date', 'platform', 'short_description'], 'string'],
+            [['status'], 'integer'],
+            [['rating'], 'string', 'max' => 4],
         ];
     }
 
@@ -56,27 +83,43 @@ class Game extends \yii\db\ActiveRecord
             'id' => 'ID',
             'title' => 'Title',
             'description' => 'Description',
-            'big_icon_link' => 'Big Icon Link',
-            'small_icon_link' => 'Small Icon Link',
+            'poster_image' => 'Poster Image',
+            'gameplay_image' => 'Gameplay Image',
+            'small_icon_image' => 'Small Icon Image',
             'video' => 'Video',
             'developer' => 'Developer',
             'publisher' => 'Publisher',
             'release_date' => 'Release Date',
             'platform' => 'Platform',
             'status' => 'Status',
-            'category_id' => 'Category ID',
             'short_description' => 'Short Description',
+            'rating' => 'Rating',
         ];
     }
 
     /**
-     * Gets query for [[Category]].
+     * Gets query for [[GameCategories]].
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getCategory()
+    public function getGameCategories()
     {
-        return $this->hasOne(GameCategory::className(), ['id' => 'category_id']);
+        $categories =  $this->hasMany(GameCategory::className(), ['game_id' => 'id'])->all();
+        $result = [];
+        foreach ($categories as $category) {
+            $item = $category->category;
+            $result[] = $item;
+        }
+        return $result;
+    }
+    /**
+     * Gets query for [[GameImages]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getGameImages()
+    {
+        return $this->hasMany(GameImage::className(), ['game_id' => 'id']);
     }
 
     /**

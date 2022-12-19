@@ -2,11 +2,13 @@
 
 namespace app\controllers;
 
+use app\models\Category;
 use app\models\Document;
 use app\models\Game;
 use app\models\GameCategory;
 use app\models\GameImage;
 use app\search\GameSearch;
+use yii\db\Expression;
 use yii\db\Query;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -17,31 +19,30 @@ use yii\filters\VerbFilter;
 class GameController extends BaseController
 {
     public function actionGetGame() {
-        $game = (new \yii\db\Query());
-        $game
-            ->select(['*', Game::tableName() .'.id as id', GameCategory::tableName() . '.title as category_title',
-                Game::tableName() . '.title as title',
-                Game::tableName() . '.description as description',
-                GameCategory::tableName() . '.description as category_description',
-                Document::tableName().'.link as image',
-                ])
-            ->from(Game::tableName())
-            ->leftJoin(GameCategory::tableName(),Game::tableName(). '.category_id=' . GameCategory::tableName() .'.id')
-            ->leftJoin(GameImage::tableName(), Game::tableName() . '.id=' . GameImage::tableName() . '.game_id')
-            ->leftJoin(Document::tableName(), Document::tableName() . '.id=' . GameImage::tableName() . '.document_id')
-            ->where([Game::tableName().'.id' => $this->get()->id]);
-        return $this->createAnswer(1, $game->one(), 'Игра найдена');
+        $game = Game::find()->where(['id' => $this->get()->id])->one();
+        $data = (object)$game->attributes;
+        $data->categories = $game->gameCategories;
+        $data->images = $game->gameImages;
+        return $this->createAnswer(1, $data, 'Игра найдена');
+    }
+    public function actionGetRecommendedGames() {
+        $game = Game::find()->where(['id' => $this->get()->id])->one();
+        $categories = $game->gameCategories;
+        $games =  [];
+        $gameCategory = GameCategory::find();
+        foreach ($categories as $category) {
+            $gameCategory->orWhere(['category_id' => $category->id]);
+        }
+        $gameCategory->andWhere(['!=', 'game_id', $game->id]);
+        $gameCategory->offset(0)->limit(4)->orderBy(new Expression('rand()'));
+        foreach ($gameCategory->all() as $game) {
+            $games[] = $game->game;
+        }
+        return $this->createAnswer(1, $games, 'Игры найдены');
     }
     public function actionGetGames() {
-        $games = (new \yii\db\Query());
-        $games
-            ->select(['*', GameCategory::tableName() . '.title as category_title',
-                Game::tableName() . '.title as title',
-                Game::tableName() . '.description as description',
-                GameCategory::tableName() . '.description as category_description'])
-            ->from(Game::tableName())
-            ->leftJoin(GameCategory::tableName(),Game::tableName(). '.category_id=' . GameCategory::tableName() .'.id');
-        $count = $games->count();
+        $games = Game::find()->orderBy(new Expression('rand()'));
+        $count =  Game::find()->count();
         if($this->get()->limit) {
             $games->limit = $this->get()->limit;
         }
@@ -49,8 +50,15 @@ class GameController extends BaseController
             $games->offset = $this->get()->offset;
         }
         $games = $games->all();
+        $result = [];
+        foreach ($games as $game) {
+            $item = (object)$game->attributes;
+            $item->categories = $game->gameCategories;
+            $item->images = $game->gameImages;
+            $result[] = $item;
+        }
         $data = (object)[];
-        $data->games = $games;
+        $data->games = $result;
         $data->total = $count;
         return $this->createAnswer(1, $data);
     }

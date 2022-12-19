@@ -4,9 +4,13 @@ namespace app\controllers;
 
 use app\models\Game;
 use app\search\GameSearch;
+use Yii;
+use yii\helpers\FileHelper;
+use yii\helpers\Url;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
+use yii\web\UploadedFile;
 
 /**
  * GamesController implements the CRUD actions for Game model.
@@ -94,6 +98,36 @@ class GamesController extends Controller
         $model = $this->findModel($id);
 
         if ($this->request->isPost && $model->load($this->request->post()) && $model->save()) {
+            $image = UploadedFile::getInstances($model, 'poster_image_file')[0];
+            if($image) {
+                if($model->poster_image) {
+                    FileHelper::unlink($model->poster_image);
+                }
+                if($image->saveAs('img/posters/' . $model->id . '_'. $image->baseName . '.' . $image->extension)) {
+                    $model->poster_image =  Url::base(true) . '/img/posters/' . $model->id . '_'. $image->baseName . '.' . $image->extension;
+                    $model->save();
+                }
+            }
+            $image = UploadedFile::getInstances($model, 'small_icon_file')[0];
+            if($image) {
+                if($model->small_icon_image) {
+                    FileHelper::unlink($model->small_icon_image);
+                }
+                if($image->saveAs('img/icons/' . $model->id . '_'. $image->baseName . '.' . $image->extension)) {
+                    $model->small_icon_image =  Url::base(true) . '/img/icons/' . $model->id . '_'. $image->baseName . '.' . $image->extension;
+                    $model->save();
+                }
+            }
+            $image = UploadedFile::getInstances($model, 'gameplay_image_file')[0];
+            if($image) {
+                if(file_exists($model->gameplay_image)) {
+                    FileHelper::unlink($model->gameplay_image);
+                }
+                if($image->saveAs('img/gameplay_images/' . $model->id . '_'. $image->baseName . '.' . $image->extension)) {
+                    $model->gameplay_image = Url::base(true) . '/img/gameplay_images/' . $model->id . '_'. $image->baseName . '.' . $image->extension;
+                    $model->save();
+                }
+            }
             return $this->redirect(['view', 'id' => $model->id]);
         }
 

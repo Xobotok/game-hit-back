@@ -17,8 +17,8 @@ class GameSearch extends Game
     public function rules()
     {
         return [
-            [['id', 'status', 'category_id'], 'integer'],
-            [['title', 'description', 'big_icon_link', 'small_icon_link', 'video', 'developer', 'publisher', 'release_date', 'platform', 'short_description'], 'safe'],
+            [['id', 'status'], 'integer'],
+            [['title', 'description', 'poster_image', 'gameplay_image', 'small_icon_image', 'video', 'developer', 'publisher', 'release_date', 'platform', 'short_description', 'rating'], 'safe'],
         ];
     }
 
@@ -60,19 +60,20 @@ class GameSearch extends Game
         $query->andFilterWhere([
             'id' => $this->id,
             'status' => $this->status,
-            'category_id' => $this->category_id,
         ]);
 
         $query->andFilterWhere(['like', 'title', $this->title])
             ->andFilterWhere(['like', 'description', $this->description])
-            ->andFilterWhere(['like', 'big_icon_link', $this->big_icon_link])
-            ->andFilterWhere(['like', 'small_icon_link', $this->small_icon_link])
+            ->andFilterWhere(['like', 'poster_image', $this->poster_image])
+            ->andFilterWhere(['like', 'gameplay_image', $this->gameplay_image])
+            ->andFilterWhere(['like', 'small_icon_image', $this->small_icon_image])
             ->andFilterWhere(['like', 'video', $this->video])
             ->andFilterWhere(['like', 'developer', $this->developer])
             ->andFilterWhere(['like', 'publisher', $this->publisher])
             ->andFilterWhere(['like', 'release_date', $this->release_date])
             ->andFilterWhere(['like', 'platform', $this->platform])
-            ->andFilterWhere(['like', 'short_description', $this->short_description]);
+            ->andFilterWhere(['like', 'short_description', $this->short_description])
+            ->andFilterWhere(['like', 'rating', $this->rating]);
 
         return $dataProvider;
     }

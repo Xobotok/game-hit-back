@@ -21,9 +21,11 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'description') ?>
 
-    <?= $form->field($model, 'big_icon_link') ?>
+    <?= $form->field($model, 'poster_image') ?>
 
-    <?= $form->field($model, 'small_icon_link') ?>
+    <?= $form->field($model, 'gameplay_image') ?>
+
+    <?php // echo $form->field($model, 'small_icon_image') ?>
 
     <?php // echo $form->field($model, 'video') ?>
 
@@ -37,9 +39,9 @@ use yii\widgets\ActiveForm;
 
     <?php // echo $form->field($model, 'status') ?>
 
-    <?php // echo $form->field($model, 'category_id') ?>
-
     <?php // echo $form->field($model, 'short_description') ?>
+
+    <?php // echo $form->field($model, 'rating') ?>
 
     <div class="form-group">
         <?= Html::submitButton('Search', ['class' => 'btn btn-primary']) ?>
