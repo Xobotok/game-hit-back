@@ -20,6 +20,8 @@ class GameController extends BaseController
 {
     public function actionGetGame() {
         $game = Game::find()->where(['id' => $this->get()->id])->one();
+        $game->visits = $game->visits + 1;
+        $game->save();
         $data = (object)$game->attributes;
         $data->categories = $game->gameCategories;
         $data->images = $game->gameImages;
@@ -61,5 +63,8 @@ class GameController extends BaseController
         $data->games = $result;
         $data->total = $count;
         return $this->createAnswer(1, $data);
+    }
+    public function actionGetTopGames() {
+
     }
 }

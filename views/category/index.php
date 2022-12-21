@@ -1,24 +1,24 @@
 <?php
 
-use app\models\GameCategory;
+use app\models\Category;
 use yii\helpers\Html;
 use yii\helpers\Url;
 use yii\grid\ActionColumn;
 use yii\grid\GridView;
 
 /* @var $this yii\web\View */
-/* @var $searchModel app\search\GameCategorySearch */
+/* @var $searchModel app\search\CategorySearch */
 /* @var $dataProvider yii\data\ActiveDataProvider */
 
-$this->title = 'Game Categories';
+$this->title = 'Categories';
 $this->params['breadcrumbs'][] = $this->title;
 ?>
-<div class="game-category-index">
+<div class="category-index">
 
     <h1><?= Html::encode($this->title) ?></h1>
 
     <p>
-        <?= Html::a('Create Game Category', ['create'], ['class' => 'btn btn-success']) ?>
+        <?= Html::a('Create Category', ['create'], ['class' => 'btn btn-success']) ?>
     </p>
 
     <?php // echo $this->render('_search', ['model' => $searchModel]); ?>
@@ -30,11 +30,12 @@ $this->params['breadcrumbs'][] = $this->title;
             ['class' => 'yii\grid\SerialColumn'],
 
             'id',
-            'game_id',
-            'category_id',
+            'title:ntext',
+            'description:ntext',
+            'image',
             [
                 'class' => ActionColumn::className(),
-                'urlCreator' => function ($action, GameCategory $model, $key, $index, $column) {
+                'urlCreator' => function ($action, Category $model, $key, $index, $column) {
                     return Url::toRoute([$action, 'id' => $model->id]);
                  }
             ],

@@ -4,17 +4,19 @@ use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 
 /* @var $this yii\web\View */
-/* @var $model app\models\GameCategory */
+/* @var $model app\models\Category */
 /* @var $form yii\widgets\ActiveForm */
 ?>
 
-<div class="game-category-form">
+<div class="category-form">
 
     <?php $form = ActiveForm::begin(); ?>
 
-    <?= $form->field($model, 'game_id')->textInput() ?>
+    <?= $form->field($model, 'title')->textarea(['rows' => 6]) ?>
 
-    <?= $form->field($model, 'category_id')->textInput() ?>
+    <?= $form->field($model, 'description')->textarea(['rows' => 6]) ?>
+
+    <?= $form->field($model, 'image')->textInput() ?>
 
     <div class="form-group">
         <?= Html::submitButton('Save', ['class' => 'btn btn-success']) ?>

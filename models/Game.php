@@ -22,6 +22,7 @@ use yii\web\UploadedFile;
  * @property int $status
  * @property string|null $short_description
  * @property string $rating
+ * @property int $visits
  *
  * @property GameCategory[] $gameCategories
  * @property GameImage[] $gameImages
@@ -69,7 +70,7 @@ class Game extends \yii\db\ActiveRecord
                 'tooBig' => 'Limit is 500KB'
             ],
             [['title', 'poster_image', 'description', 'gameplay_image', 'small_icon_image', 'video', 'developer', 'publisher', 'release_date', 'platform', 'short_description'], 'string'],
-            [['status'], 'integer'],
+            [['status', 'visits'], 'integer'],
             [['rating'], 'string', 'max' => 4],
         ];
     }
